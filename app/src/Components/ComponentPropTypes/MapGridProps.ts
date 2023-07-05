@@ -1,4 +1,5 @@
+import { CellClass } from './../Cell';
 export type MapGridProps = {
-  rows: number,
-  cols: number
+  cells: CellClass[][]
+  placePiece: (pieceName: string, x: number, y: number) => void
 }
