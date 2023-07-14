@@ -1,22 +1,21 @@
-import { Piece, allPieceDict, allPieces } from "./Pieces"
+import { CellClass } from "./Cell"
+import { DraggedPiece, Piece, allPieces } from "./Pieces"
 
-import { CellClass } from "../Components/Cell"
-
-const findPiece = (pieceName: string): Piece => allPieceDict[pieceName]
-
+/* const findPiece = (pieceName: string): Piece => allPieceDict[pieceName]
+ */
 export class Game {
-  static PlacePiece(cells: CellClass[][], pieceName: string, x: number, y: number): CellClass[] {
-    let piece = findPiece(pieceName)
-    let updatedCells: CellClass[] = []
-    piece.value.forEach((row, i) => {
-      row.forEach((cell, j) => {
-        if (cell === 1) {
-          //cells[x + i][y + j].filled = true
-          updatedCells.push(cells[y + i][x + j])
-        }
-      })
-    });
-    return updatedCells
+  static Init(cols: number, rows: number): CellClass[][] {
+    let cells: CellClass[][] = []
+    let key = 0
+    for (let i = 0; i < cols; i++) {
+      let row: CellClass[] = []
+      for (let j = 0; j < rows; j++) {
+        row.push(new CellClass(key, j, i))
+        key++
+      }
+      cells.push(row)
+    }
+    return cells
   }
 
   static GetThreeRandomPieces = () => {
@@ -28,7 +27,57 @@ export class Game {
     return pieces
   }
 
-  static GetThreeFirstPieces = () => [allPieces[0], allPieces[1], allPieces[2]]
+  static CanPlacePiece = (cells: CellClass[][], piece: DraggedPiece, x: number, y: number): boolean => {
+    let canPlacePiece = true
+    piece.value.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        if (cell === 1 && (cells[y + i] === undefined || cells[y + i][x + j] === undefined || cells[y + i][x + j].filled)) {
+          canPlacePiece = false
+        }
+      })
+    })
+
+    return canPlacePiece
+  }
+
+  static PlacePiece = (cells: CellClass[][], draggedPiece: DraggedPiece, x: number, y: number): CellClass[][] => {
+    let newCells = [...cells]
+    draggedPiece.value.forEach((row, i) => {
+      row.forEach((val, j) => {
+        if (val === 1) {
+          newCells[y + i][x + j].filled = true
+        }
+      })
+    });
+
+    return newCells
+  }
+
+  static SetHover = (cells: CellClass[][], draggedPiece: DraggedPiece, x: number, y: number): CellClass[][] => {
+    let newCells = [...cells]
+    draggedPiece.value.forEach((row, i) => {
+      row.forEach((val, j) => {
+        if (val === 1) {
+          newCells[y + i][x + j].hover = true
+        }
+      })
+    });
+
+    return newCells
+  }
+
+  static ClearHover = (cells: CellClass[][]): CellClass[][] => {
+    let newCells = [...cells]
+    cells.forEach(row => {
+      row.forEach(cell => {
+        cell.hover = false
+      });
+    });
+
+    return newCells
+  }
+
+  static GetThreeFirstPieces = () => [allPieces[0], allPieces[1], allPieces[8]]
 
 }
 

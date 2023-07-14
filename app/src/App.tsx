@@ -10,13 +10,7 @@ import { useState } from 'react';
 function App() {
   const [randomPieces] = useState(Game.GetThreeRandomPieces())
   const cells = useCellsStore((state) => state.cells)
-  const updateCells = useCellsStore((state) => state.updateCells)
 
-  const placePiece = (pieceName: string, x: number, y: number) => {
-    let updatedPieces = Game.PlacePiece([...cells], pieceName, x, y)
-    console.log(x, y)
-    updateCells(updatedPieces)
-  }
   return (
     <div className="App">
       <Grid
@@ -29,7 +23,7 @@ function App() {
           <h1>Woodoku</h1>
         </Grid>
         <Grid item>
-          <MapGrid cells={cells} placePiece={placePiece} />
+          <MapGrid cells={cells} />
         </Grid>
         <Grid item style={{ display: "flex" }}>
           {randomPieces.map((piece, i) => {

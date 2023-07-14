@@ -1,4 +1,6 @@
-import Cell from "./Cell"
+import { DraggedPiece } from "../Game/Pieces"
+import { useDraggedPieceStore } from "../Store/useDraggedPieceStore"
+import CellImage from "./CellImage"
 import { PieceProps } from "./ComponentPropTypes/PieceProps"
 import React from "react"
 
@@ -7,17 +9,21 @@ const Piece = ({ piece }: PieceProps) => {
   const cellSize = 50
   let key = 0
 
-  const dragStart = (event: React.DragEvent, piece: string) => {
+  const setDraggedPiece = useDraggedPieceStore(state => state.setDraggedPiece)
+
+  const dragStart = (event: React.DragEvent) => {
     var elementRect = event.currentTarget.getBoundingClientRect()
     var relMouseX = Math.floor((event.clientX - elementRect.left) / cellSize)
     var relMouseY = Math.floor((event.clientY - elementRect.top) / cellSize)
-    event.dataTransfer.setData("piece", piece + "-" + relMouseX + "" + relMouseY);
+
+    var draggedPiece = new DraggedPiece(piece.value, piece.name, relMouseX, relMouseY)
+    setDraggedPiece(draggedPiece)
   }
 
   return (
     <div
       draggable
-      onDragStart={(e) => dragStart(e, piece.name)}
+      onDragStart={dragStart}
       style={{
         display: "grid",
         margin: "10px",
@@ -28,7 +34,7 @@ const Piece = ({ piece }: PieceProps) => {
       {piece.value.map(row => {
         return row.map(col => {
           key++
-          return <Cell key={key} cellSize={cellSize} image={col === 1}></Cell>
+          return <CellImage key={key} cellSize={cellSize} visible={col === 1}></CellImage>
         })
       })}
     </div >

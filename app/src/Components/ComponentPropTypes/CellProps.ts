@@ -1,7 +1,8 @@
-import { CellClass } from './../Cell';
+import { CellClass } from "../../Game/Cell"
+
 export type CellProps = {
   cellSize: number
-  cell?: CellClass
-  image?: boolean
+  cell: CellClass
   border?: boolean
+  hover?: boolean
 }

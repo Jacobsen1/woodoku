@@ -1,5 +1,5 @@
-import { CellClass } from './../Cell';
+import { CellClass } from "../../Game/Cell"
+
 export type MapGridProps = {
   cells: CellClass[][]
-  placePiece: (pieceName: string, x: number, y: number) => void
 }

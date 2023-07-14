@@ -8,6 +8,19 @@ export class Piece {
   }
 }
 
+export class DraggedPiece extends Piece {
+  mouseX: number
+  mouseY: number
+  gridX: number = -1
+  gridY: number = -1
+
+  constructor(value: number[][], name: string, mouseX: number, mouseY: number) {
+    super(value, name)
+    this.mouseX = mouseX
+    this.mouseY = mouseY
+  }
+}
+
 const Joe =
   [[0, 1, 0],
   [1, 1, 1],
