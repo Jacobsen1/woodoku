@@ -10,6 +10,8 @@ const Cell = memo(({ cellSize, cell, image, border }: CellProps) => {
         width: cellSize - 2 + "px",
         height: cellSize - 2 + "px",
         border: border ? "1px solid black" : "",
+        borderLeft: cell && (cell.y === 3 || cell.y === 6) ? "3px solid black" : ",",
+        borderTop: cell && (cell.x === 3 || cell.x === 6) ? "3px solid black" : ",",
         backgroundImage: cell?.filled ? "url('./wood.png')" : ""
       }} />
   )

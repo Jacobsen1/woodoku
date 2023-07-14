@@ -22,9 +22,9 @@ const MapGrid = ({ cells, placePiece }: MapGridProps) => {
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(" + cells.length + ", 1fr)",
-        width: cellSize * cells.length,
-        height: cellSize * cells.length,
-        border: "1px solid black"
+        width: cellSize * cells.length + 3,
+        height: cellSize * cells.length + 3,
+        border: "3px solid black"
       }}
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
