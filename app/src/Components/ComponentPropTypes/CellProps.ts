@@ -5,4 +5,5 @@ export type CellProps = {
   cell: CellClass
   border?: boolean
   hover?: boolean
+  removable?: boolean
 }

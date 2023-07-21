@@ -2,6 +2,7 @@
 export class CellClass {
   filled: boolean = false
   hover: boolean = false
+  removable: boolean = false
   size = 50
   key: number
   x: number
@@ -12,4 +13,10 @@ export class CellClass {
     this.x = x
     this.y = y
   }
+
+  static printFilled(cells: CellClass[][]): void {
+    let printableCells = cells.map(row => row.map(cell => cell.filled))
+    console.table(printableCells)
+  }
 }
+

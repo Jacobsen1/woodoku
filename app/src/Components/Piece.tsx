@@ -1,8 +1,8 @@
-import { DraggedPiece } from "../Game/Pieces"
-import { useDraggedPieceStore } from "../Store/useDraggedPieceStore"
 import CellImage from "./CellImage"
+import { DraggedPiece } from "../Game/Pieces"
 import { PieceProps } from "./ComponentPropTypes/PieceProps"
 import React from "react"
+import { useDraggedPieceStore } from "../Store/useDraggedPieceStore"
 
 const Piece = ({ piece }: PieceProps) => {
   const pieceDimension = piece.value.length

@@ -1,7 +1,9 @@
 import Cell from "./Cell"
-import { MapGridProps } from "./ComponentPropTypes/MapGridProps"
+import { useCellsStore } from "../Store/useCellsStore"
 
-const MapGrid = ({ cells }: MapGridProps) => {
+const MapGrid = () => {
+
+  const cells = useCellsStore((state) => state.cells)
 
   const cellSize = cells[0][0].size
 
@@ -16,7 +18,7 @@ const MapGrid = ({ cells }: MapGridProps) => {
       }}>
       {cells.map((row, i) => {
         return row.map((cell, j) => {
-          return <Cell key={cell.key} cell={cell} cellSize={cellSize} border hover={cell.hover}></Cell>
+          return <Cell key={cell.key} cell={cell} cellSize={cellSize} border hover={cell.hover} removable={cell.removable}></Cell>
         })
       })
       }
