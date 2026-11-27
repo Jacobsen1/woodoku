@@ -8,9 +8,7 @@ const PieceSelection = () => {
   return (
     <div style={{ width: "600px", height: "200px" }} data-testid="piece-selection">
       <Stack direction="row" sx={{ justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
-        {randomPieces.map((piece, i) => {
-          return <Piece piece={piece} key={i}></Piece>
-        })}
+        {randomPieces.map((piece) => <Piece piece={piece} key={piece.name} />)}
       </Stack>
     </div>
   )

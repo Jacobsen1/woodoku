@@ -1,22 +1,12 @@
-
 export class CellClass {
-  filled: boolean = false
-  hover: boolean = false
-  removable: boolean = false
-  size = 50
-  key: number
+  filled = false
+  hover = false
+  removable = false
   x: number
   y: number
 
-  constructor(key: number, x: number, y: number) {
-    this.key = key
+  constructor(x: number, y: number) {
     this.x = x
     this.y = y
   }
-
-  static printFilled(cells: CellClass[][]): void {
-    let printableCells = cells.map(row => row.map(cell => cell.filled))
-    console.table(printableCells)
-  }
 }
-

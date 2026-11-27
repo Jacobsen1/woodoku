@@ -8,8 +8,5 @@ type DraggedPieceStore = {
 
 export const useDraggedPieceStore = create<DraggedPieceStore>((set) => ({
   draggedPiece: new DraggedPiece([], "", 0, 0),
-  setDraggedPiece: (draggedPiece) => set(() => {
-    return { draggedPiece }
-  })
+  setDraggedPiece: (draggedPiece) => set({ draggedPiece }),
 }))
-
