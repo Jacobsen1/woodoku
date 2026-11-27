@@ -52,6 +52,11 @@ const Cell = memo(({ cell, border, hover, removable }: CellProps) => {
 
   return (
     <div
+      data-testid="cell"
+      data-x={cell.x}
+      data-y={cell.y}
+      data-filled={cell.filled}
+      data-hover={!!hover}
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={onDragEnter}
