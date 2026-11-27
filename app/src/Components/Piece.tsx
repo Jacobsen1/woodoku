@@ -22,6 +22,8 @@ const Piece = ({ piece }: PieceProps) => {
 
   return (
     <div
+      data-testid="piece"
+      data-piece-name={piece.name}
       draggable
       onDragStart={dragStart}
       style={{
