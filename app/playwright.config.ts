@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 4173
+const PORT = 5001
 // Tall enough to show the board and the piece tray without scrolling, which
 // otherwise shifts elements between dragstart and drop.
 const GAME_VIEWPORT = { width: 1280, height: 1100 }

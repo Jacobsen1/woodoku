@@ -17,19 +17,23 @@ const toRandom = (names: PieceName[]) =>
 /**
  * Makes the random piece generator deterministic: Math.random first returns values from
  * `window.__pieceQueue` (picking the given pieces), after that a seeded PRNG takes over.
- * Must be called before `page.goto`. Only queue as many pieces as the game draws at
- * that moment, since libraries may call Math.random as well.
+ * Must be called before `page.goto`.
  */
 export async function forcePieces(page: Page, pieces: PieceName[]) {
   await page.addInitScript((queue: number[]) => {
     const w = window as unknown as { __pieceQueue: number[] }
     w.__pieceQueue = queue
     let seed = 42
-    Math.random = () => {
-      const next = w.__pieceQueue.shift()
-      if (next !== undefined) return next
+    const seeded = () => {
       seed = (seed * 1664525 + 1013904223) % 4294967296
       return seed / 4294967296
+    }
+    Math.random = () => {
+      // Only the game's own piece draws take queued values. Libraries (e.g. React
+      // DOM, which Module Federation may load first) get the seeded sequence.
+      const fromGame = new Error().stack?.includes('GetThreeRandomPieces')
+      const next = fromGame ? w.__pieceQueue.shift() : undefined
+      return next ?? seeded()
     }
   }, toRandom(pieces))
 }

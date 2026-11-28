@@ -1,11 +1,7 @@
-import './index.css';
-
-import App from './App';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client'
+import GameRoot from './GameRoot'
+import { localStore } from './hub/localStore'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+  <GameRoot ctx={{ highscore: localStore, basePath: import.meta.env.BASE_URL }} />
+)
