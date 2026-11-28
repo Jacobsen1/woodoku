@@ -11,7 +11,15 @@ export interface HighscoreStore {
   add(game: string, score: Score): Promise<void>
 }
 
-export type GameContext = { highscore: HighscoreStore; basePath: string }
+export type GameContext = {
+  highscore: HighscoreStore
+  basePath: string
+  /**
+   * Report an error the hub cannot see, such as a crash during a React render
+   * (pass it as createRoot's onUncaughtError). The hub then shows its error card.
+   */
+  onError?: (error: unknown) => void
+}
 
 /** Mounts a game into `el` and returns a function that unmounts it. */
 export type MountFn = (el: HTMLElement, ctx: GameContext) => () => void
