@@ -2,6 +2,7 @@ import { DraggedPiece, type Piece as PieceType } from "../Game/Pieces"
 import { CELL_SIZE } from "../Game/constants"
 import CellImage from "./CellImage"
 import type { DragEvent } from "react"
+import { useCellsStore } from "../Store/useCellsStore"
 import { useDraggedPieceStore } from "../Store/useDraggedPieceStore"
 
 const Piece = ({ piece }: { piece: PieceType }) => {
@@ -15,12 +16,20 @@ const Piece = ({ piece }: { piece: PieceType }) => {
     setDraggedPiece(new DraggedPiece(piece.value, piece.name, relMouseX, relMouseY))
   }
 
+  // Fires when the drag ends, also when the piece is released off the board, on a cell where
+  // it does not fit, or the drag is cancelled: forget the piece and clear its preview.
+  const dragEnd = () => {
+    setDraggedPiece(null)
+    useCellsStore.getState().clearPreview()
+  }
+
   return (
     <div
       data-testid="piece"
       data-piece-name={piece.name}
       draggable
       onDragStart={dragStart}
+      onDragEnd={dragEnd}
       style={{
         display: "grid",
         margin: "10px",

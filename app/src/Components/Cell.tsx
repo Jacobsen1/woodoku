@@ -22,14 +22,20 @@ const Cell = memo(({ x, y }: CellProps) => {
   const hover = useCellsStore(state => state.cells[y][x].hover)
   const removable = useCellsStore(state => state.cells[y][x].removable)
 
-  /** The dragged piece and where its top-left corner lands when its grabbed cell is over this cell. */
+  /**
+   * The piece dragged from the tray and where its top-left corner lands when its grabbed
+   * cell is over this cell, or null when the drag did not start in the tray.
+   */
   const draggedPieceOrigin = () => {
     const { draggedPiece } = useDraggedPieceStore.getState()
+    if (!draggedPiece) return null
     return { draggedPiece, px: x - draggedPiece.mouseX, py: y - draggedPiece.mouseY }
   }
 
   const onDrop = () => {
-    const { draggedPiece, px, py } = draggedPieceOrigin()
+    const origin = draggedPieceOrigin()
+    if (!origin) return
+    const { draggedPiece, px, py } = origin
     const { cells, updateCells } = useCellsStore.getState()
     if (!Game.CanPlacePiece(cells, draggedPiece, px, py)) return
 
@@ -39,6 +45,7 @@ const Cell = memo(({ x, y }: CellProps) => {
     const newCells = Game.PlacePiece(cells, draggedPiece, px, py)
     const piecesForRemoval = Game.GetPiecesForRemoval(newCells)
     Game.RemovePieces(newCells, piecesForRemoval)
+    Game.ClearPreview(newCells)
 
     const clearedGroups = Game.GetClearedGroups(piecesForRemoval)
     if (clearedGroups > 0) score.incrementCombo(clearedGroups)
@@ -46,10 +53,13 @@ const Cell = memo(({ x, y }: CellProps) => {
     score.updateScore(Game.GetScore(piecesForRemoval, draggedPiece))
     tray.setPieces(newRandomPieces)
     updateCells(newCells)
+    useDraggedPieceStore.getState().setDraggedPiece(null)
   }
 
   const onDragEnter = () => {
-    const { draggedPiece, px, py } = draggedPieceOrigin()
+    const origin = draggedPieceOrigin()
+    if (!origin) return
+    const { draggedPiece, px, py } = origin
     const { cells, updateCells } = useCellsStore.getState()
     const newCells = Game.ClearPreview(cells)
 

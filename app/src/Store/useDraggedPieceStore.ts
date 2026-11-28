@@ -2,11 +2,12 @@ import { create } from 'zustand'
 import { DraggedPiece } from '../Game/Pieces'
 
 type DraggedPieceStore = {
-  draggedPiece: DraggedPiece
-  setDraggedPiece: (draggedPiece: DraggedPiece) => void
+  /** The piece being dragged from the tray, or null when no tray drag is in progress. */
+  draggedPiece: DraggedPiece | null
+  setDraggedPiece: (draggedPiece: DraggedPiece | null) => void
 }
 
 export const useDraggedPieceStore = create<DraggedPieceStore>((set) => ({
-  draggedPiece: new DraggedPiece([], "", 0, 0),
+  draggedPiece: null,
   setDraggedPiece: (draggedPiece) => set({ draggedPiece }),
 }))
