@@ -13,15 +13,21 @@ test('remoteEntry is CORS-enabled', async ({ request }) => {
   expect(res.headers()['access-control-allow-origin']).toBeTruthy()
 })
 
-test('no global body styles leak', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Woodoku' })).toBeVisible()
-  const globalSelectors = await page.evaluate(() =>
-    [...document.styleSheets]
-      .flatMap((sheet) => [...sheet.cssRules])
-      .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule)
-      .flatMap((rule) => rule.selectorText.split(',').map((s) => s.trim()))
-      .filter((s) => /^(html|body|#root|code)\b/.test(s)),
-  )
-  expect(globalSelectors).toEqual([])
+test('all bundled CSS is scoped to the game root', async ({ page }) => {
+  // The hub keeps a game's stylesheet after it unmounts, so every rule must be
+  // under .game-woodoku or it can restyle the hub and the other games.
+  await page.goto('./')
+  await page.locator('.game-woodoku').waitFor()
+  const unscoped = await page.evaluate(() => {
+    const selectors: string[] = []
+    const walk = (rules: CSSRuleList) => {
+      for (const rule of rules) {
+        if (rule instanceof CSSStyleRule) selectors.push(...rule.selectorText.split(',').map((s) => s.trim()))
+        else if (rule instanceof CSSMediaRule || rule instanceof CSSSupportsRule) walk(rule.cssRules)
+      }
+    }
+    for (const sheet of document.styleSheets) if (sheet.href !== null) walk(sheet.cssRules) // bundled CSS only
+    return selectors
+  })
+  expect(unscoped.filter((s) => !s.startsWith('.game-woodoku'))).toEqual([])
 })
