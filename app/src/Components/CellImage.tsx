@@ -1,4 +1,5 @@
-import { CELL_SIZE, WOOD_TEXTURE } from "../Game/constants"
+import { CELL_SIZE } from "../Game/constants"
+import { WOOD_TEXTURE } from "../Game/textures"
 
 const CellImage = ({ visible }: { visible: boolean }) => (
   <div data-testid="piece-cell" data-filled={visible} style={{

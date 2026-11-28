@@ -1,4 +1,5 @@
-import { BOX_SIZE, CELL_SIZE, WOOD_TEXTURE } from "../Game/constants"
+import { BOX_SIZE, CELL_SIZE } from "../Game/constants"
+import { WOOD_TEXTURE } from "../Game/textures"
 import { memo, type DragEvent } from "react"
 import { Game } from "../Game/Game"
 import { useCellsStore } from "../Store/useCellsStore"

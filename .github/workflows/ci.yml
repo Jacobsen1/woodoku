@@ -31,6 +31,9 @@ jobs:
       - name: Type-check and build
         run: npm run build
 
+      - name: Check federation output for the game hub
+        run: test -f build/remoteEntry.js
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
 
