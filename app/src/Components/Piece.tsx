@@ -1,23 +1,26 @@
+import { DraggedPiece, type Piece as PieceType } from "../Game/Pieces"
+import { CELL_SIZE } from "../Game/constants"
 import CellImage from "./CellImage"
-import { DraggedPiece } from "../Game/Pieces"
-import { PieceProps } from "./ComponentPropTypes/PieceProps"
-import React from "react"
+import type { DragEvent } from "react"
+import { useCellsStore } from "../Store/useCellsStore"
 import { useDraggedPieceStore } from "../Store/useDraggedPieceStore"
 
-const Piece = ({ piece }: PieceProps) => {
+const Piece = ({ piece }: { piece: PieceType }) => {
   const pieceDimension = piece.value.length
-  const cellSize = 50
-  let key = 0
-
   const setDraggedPiece = useDraggedPieceStore(state => state.setDraggedPiece)
 
-  const dragStart = (event: React.DragEvent) => {
-    var elementRect = event.currentTarget.getBoundingClientRect()
-    var relMouseX = Math.floor((event.clientX - elementRect.left) / cellSize)
-    var relMouseY = Math.floor((event.clientY - elementRect.top) / cellSize)
+  const dragStart = (event: DragEvent) => {
+    const elementRect = event.currentTarget.getBoundingClientRect()
+    const relMouseX = Math.floor((event.clientX - elementRect.left) / CELL_SIZE)
+    const relMouseY = Math.floor((event.clientY - elementRect.top) / CELL_SIZE)
+    setDraggedPiece(new DraggedPiece(piece.value, piece.name, relMouseX, relMouseY))
+  }
 
-    var draggedPiece = new DraggedPiece(piece.value, piece.name, relMouseX, relMouseY)
-    setDraggedPiece(draggedPiece)
+  // Fires when the drag ends, also when the piece is released off the board, on a cell where
+  // it does not fit, or the drag is cancelled: forget the piece and clear its preview.
+  const dragEnd = () => {
+    setDraggedPiece(null)
+    useCellsStore.getState().clearPreview()
   }
 
   return (
@@ -26,20 +29,17 @@ const Piece = ({ piece }: PieceProps) => {
       data-piece-name={piece.name}
       draggable
       onDragStart={dragStart}
+      onDragEnd={dragEnd}
       style={{
         display: "grid",
         margin: "10px",
         gridTemplateColumns: "repeat(" + pieceDimension + ", 1fr)",
-        width: cellSize * pieceDimension,
-        height: cellSize * pieceDimension,
+        width: CELL_SIZE * pieceDimension,
+        height: CELL_SIZE * pieceDimension,
       }}>
-      {piece.value.map(row => {
-        return row.map(col => {
-          key++
-          return <CellImage key={key} cellSize={cellSize} visible={col === 1}></CellImage>
-        })
-      })}
-    </div >
+      {piece.value.flatMap((row, i) =>
+        row.map((col, j) => <CellImage key={i * pieceDimension + j} visible={col === 1} />))}
+    </div>
   )
 }
 

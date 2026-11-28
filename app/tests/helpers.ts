@@ -1,18 +1,18 @@
 import { expect, type Locator, type Page } from '@playwright/test'
+import { CELL_SIZE } from '../src/Game/constants'
+import { allPieces } from '../src/Game/Pieces'
 
-/** Piece names in the same order as `allPieces` in src/Game/Pieces.ts. */
-export const PIECE_NAMES = [
-  'Joe', 'Mac', 'Richard', 'LilRichie', 'Craig', 'Caden', 'TheWork', 'Dot', 'TwoDot',
-  'ThreeDot', 'FourDot', 'FiveDot', 'Luigi', 'Waluigi', 'EvilWork', 'Stair', 'ThreeStair',
-  'FourStair', 'TheHelmet',
-] as const
+const PIECE_NAMES = allPieces.map((p) => p.name)
 
-export type PieceName = (typeof PIECE_NAMES)[number]
+export type PieceName = string
 
-const PIECE_CELL_SIZE = 50
-
+/** The Math.random() values that make `Game.GetThreeRandomPieces` pick the given pieces. */
 const toRandom = (names: PieceName[]) =>
-  names.map((name) => (PIECE_NAMES.indexOf(name) + 0.5) / PIECE_NAMES.length)
+  names.map((name) => {
+    const index = PIECE_NAMES.indexOf(name)
+    if (index === -1) throw new Error(`Unknown piece "${name}"`)
+    return (index + 0.5) / PIECE_NAMES.length
+  })
 
 /**
  * Makes the random piece generator deterministic: Math.random first returns values from
@@ -54,6 +54,9 @@ export const cell = (page: Page, x: number, y: number) =>
 export const filledCells = (page: Page) =>
   page.locator('[data-testid="cell"][data-filled="true"]')
 
+export const hoveredCells = (page: Page) =>
+  page.locator('[data-testid="cell"][data-hover="true"]')
+
 export const piece = (page: Page, name: PieceName) =>
   page.locator(`[data-testid="piece"][data-piece-name="${name}"]`)
 
@@ -76,6 +79,12 @@ export async function expectFilled(page: Page, coords: [number, number][]) {
   }
 }
 
+/** Position within a piece element of the centre of its [column, row] cell. */
+const grabPosition = ([col, row]: [number, number]) => ({
+  x: col * CELL_SIZE + CELL_SIZE / 2,
+  y: row * CELL_SIZE + CELL_SIZE / 2,
+})
+
 /**
  * Drags a piece from the tray onto the board using native HTML5 drag and drop.
  * `grab` is the [column, row] of the piece cell the mouse holds, `target` is the board
@@ -87,10 +96,17 @@ export async function dragPiece(
   grab: [number, number],
   target: [number, number],
 ) {
-  await source.dragTo(cell(page, target[0], target[1]), {
-    sourcePosition: {
-      x: grab[0] * PIECE_CELL_SIZE + PIECE_CELL_SIZE / 2,
-      y: grab[1] * PIECE_CELL_SIZE + PIECE_CELL_SIZE / 2,
-    },
-  })
+  await source.dragTo(cell(page, target[0], target[1]), { sourcePosition: grabPosition(grab) })
+}
+
+/**
+ * Starts a drag of `source` held at its `grab` cell without dropping it, so the board can be
+ * inspected mid-drag. Returns a function that moves the drag over board cell (x, y).
+ */
+export async function startDrag(page: Page, source: Locator, grab: [number, number]) {
+  const dataTransfer = await page.evaluateHandle(() => new DataTransfer())
+  const box = (await source.boundingBox())!
+  const { x, y } = grabPosition(grab)
+  await source.dispatchEvent('dragstart', { dataTransfer, clientX: box.x + x, clientY: box.y + y })
+  return (x: number, y: number) => cell(page, x, y).dispatchEvent('dragenter', { dataTransfer })
 }

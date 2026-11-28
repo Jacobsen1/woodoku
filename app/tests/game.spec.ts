@@ -6,9 +6,11 @@ import {
   expectScore,
   expectTray,
   filledCells,
+  hoveredCells,
   openGame,
   piece,
   queueNextPieces,
+  startDrag,
 } from './helpers'
 
 test.describe('Woodoku', () => {
@@ -23,10 +25,8 @@ test.describe('Woodoku', () => {
 
     const tray = page.getByTestId('piece')
     await expect(tray).toHaveCount(3)
-    for (const p of await tray.all()) {
-      await expect(p).toBeVisible()
-      await expect(p).toHaveAttribute('draggable', 'true')
-    }
+    await expect(page.locator('[data-testid="piece"][draggable="true"]')).toHaveCount(3)
+    for (const p of await tray.all()) await expect(p).toBeVisible()
     const names = await tray.evaluateAll((els) => els.map((el) => el.getAttribute('data-piece-name')))
     expect(new Set(names).size).toBe(3)
   })
@@ -127,29 +127,21 @@ test.describe('Woodoku', () => {
     await openGame(page, ['FiveDot', 'FourDot', 'Dot'])
     await dragPiece(page, piece(page, 'FiveDot'), [0, 2], [0, 0])
 
-    // Start a drag manually so we can inspect the board mid-drag.
-    const dataTransfer = await page.evaluateHandle(() => new DataTransfer())
-    const source = piece(page, 'FourDot')
-    const box = (await source.boundingBox())!
-    await source.dispatchEvent('dragstart', {
-      dataTransfer,
-      clientX: box.x + 25,
-      clientY: box.y + 125,
-    })
-    await cell(page, 5, 0).dispatchEvent('dragenter', { dataTransfer })
+    const dragOver = await startDrag(page, piece(page, 'FourDot'), [0, 2])
+    await dragOver(5, 0)
 
     for (let x = 5; x < 9; x++) {
       await expect(cell(page, x, 0)).toHaveAttribute('data-hover', 'true')
     }
-    await expect(page.locator('[data-testid="cell"][data-hover="true"]')).toHaveCount(4)
+    await expect(hoveredCells(page)).toHaveCount(4)
     // Already filled cells in the row that would be cleared are dimmed.
     for (let x = 0; x < 5; x++) {
       await expect(cell(page, x, 0)).toHaveCSS('filter', 'brightness(0.65)')
     }
 
     // Moving to a position where the piece does not fit removes the preview.
-    await cell(page, 7, 5).dispatchEvent('dragenter', { dataTransfer })
-    await expect(page.locator('[data-testid="cell"][data-hover="true"]')).toHaveCount(0)
+    await dragOver(7, 5)
+    await expect(hoveredCells(page)).toHaveCount(0)
     await expect(cell(page, 0, 0)).toHaveCSS('filter', 'none')
   })
 })

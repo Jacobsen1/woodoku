@@ -11,8 +11,6 @@ export class Piece {
 export class DraggedPiece extends Piece {
   mouseX: number
   mouseY: number
-  gridX: number = -1
-  gridY: number = -1
 
   constructor(value: number[][], name: string, mouseX: number, mouseY: number) {
     super(value, name)
@@ -137,5 +135,3 @@ export const allPieces = [
   new Piece(FourStair, "FourStair"),
   new Piece(TheHelmet, "TheHelmet")
 ]
-
-export const allPieceDict = Object.fromEntries(allPieces.map(x => [x.name, x]))
